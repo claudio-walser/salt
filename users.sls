@@ -34,3 +34,24 @@ sshkeys:
   file.managed:
     - source:
       - /srv/salt/files/etc/sudoers.d/claudio
+
+bashrc:
+  file.replace:
+    - name: /home/claudio/.bashrc
+    - pattern: ^alias god=.*
+    - repl: alias god='sudo su -'
+    - append_if_not_found: True
+
+sshd:
+  file.replace:
+    - name: /etc/ssh/sshd_config
+    - pattern: ^AllowUsers .*
+    - repl: AllowUsers claudio
+    - append_if_not_found: True
+
+  service.running:
+    - name: sshd
+    - enable: True
+    - reload: True
+    - watch:
+      - file: /etc/ssh/sshd_config
